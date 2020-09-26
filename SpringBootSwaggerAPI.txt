@@ -1,0 +1,127 @@
+
+Log4J
+https://www.youtube.com/c/NareshIT/search?query=raghu+log
+JUnit
+https://www.youtube.com/c/NareshIT/search?query=raghu+junit
+
+a) Api Creation = Writing one Rest Controllre with different Operations(methods) with Types
+                GET,POST,PUT,DELETE and PATCH.
+
+Ex: For a Module (Ex: Employee Module) -> EmployeeRestController (it is a API)
+
+b) Endpoint: It is a Collection of Details: URL, HttpMethod Type, Input, Output, Header param
+           ..etc. By using these details client can make request.
+
+Ex:
+  URL :  
+    base : http://localhost:8080/product
+     save() : /save    -- POST
+     update():/modify  -- PUT
+    Header param: Content-Type : ---
+
+	
+b) API Documentation: (Swagger)
+  It is a Document that contains all Endpoint Details of given API (RestController)
+  With possible inputs and sample screens..etc.
+
+  General Document can also be provided as Word-Doc even (or simple Text file).
+  We can even create one Responsive Documentation ie we can even test our all Endpoints.
+
+  ------Swagger----------------
+  Swagger is open source Java library, used to create UI (Responsive Document)
+  where we can even test all our operations.
+
+  => It is one time configuration in application, even if we have multiple RestController.
+  => it will create one simple UI with all RestController Operations, where every one
+     test our application manually.
+  => Here, no need to enter URL, Method Type, Header Params..etc manually.
+     Only Enter Inputs (PathVariables, Request Body) and click on execute,
+     we can find Response below.
+
+  => Model class overview also provided. Like variable and its type.
+  => Swagger + SpringFox  has provided Sping Boot based Swagger, that must be added to
+     our application.
+
+
+Step#1 Add below dependencies in pom.xml
+
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.9.2</version>
+</dependency>
+
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.9.2</version>
+</dependency>
+
+Step#2 Define one Swagger Config class
+
+ -> Create one Docket with Documentation Version
+ -> select RestControllers
+ -> apis - using basePackage("in.nareshit.raghu.controller.rest")
+ -> common paths -- RegExpression -/rest.*
+ -> Finally Build
+
+--SwaggerConfig.java---
+package in.nareshit.raghu.config;
+
+import static springfox.documentation.builders.PathSelectors.regex;
+import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
+
+import java.util.Collections;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+
+	@Bean
+	public Docket createDocket() {
+		return new Docket(DocumentationType.SWAGGER_2) // Swagger Screen
+				.select() // read rest controllers
+				.apis(basePackage("in.nareshit.raghu.controller.rest")) // (api)rest controller from common package name
+				.paths(regex("/rest.*")) // having one common starting path (/.*)
+				.build() //create screen
+				.useDefaultResponseMessages(false) // hide error codes at swagger
+				.apiInfo(apiInfo()) //optional meta data
+				;
+		
+	}
+
+	private ApiInfo apiInfo() {
+		return new ApiInfo(
+				"Product NIT APP", 
+				"This is a sample Product Store", 
+				"3.2 GA", 
+				"https://nareshit.in/", 
+				new Contact("Raghu", "http://nareshit.raghu.in/", "javabyraghu@gmail.com"), 
+				"NIT Lmtd License", 
+				"https://nareshit.in/license", 
+				Collections.emptyList());
+	}
+	
+	
+}
+
+
+Step#3 Run Application and Enter URL like  : .../swagger-ui.html  
+ex:  http://localhost:8080/swagger-ui.html  
+
+
+*)Note:
+a) ApiInfo means it is information about API(code)
+  ie Company name, title, description, License details, contact details..etc
+
+b) At Controller method level: @ApiOperation("Fetch one Product by Id from Database")
+   To modify default description from methodName to readable text format.
